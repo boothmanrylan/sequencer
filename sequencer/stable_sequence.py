@@ -74,10 +74,9 @@ def find_stable_sequence(events, value, min_stability, max_masked, max_errors):
         # will not because it has more than max_errors erros. To overcome this
         # we only consider how many matches occur before max_errors errors
         # occur.
-        test = (accumulative_matches
-                .multiply(accumulative_errors.lte(max_errors))
-                .reduce(ee.Reducer.max())
-                .gte(min_stability))
+        test = (accumulative_matches.multiply(
+            accumulative_errors.lte(max_errors)).reduce(
+                ee.Reducer.max()).gte(min_stability))
 
         # ensure that the first element matches to avoid off-by-one errors
         first_is_match = compare.select(0).eq(value)
