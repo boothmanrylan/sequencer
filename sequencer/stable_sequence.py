@@ -19,9 +19,11 @@ def accumulative_sum(image):
         pixels values in band N represent the sum of all values in that pixel
         in the first N bands.
     """
+    image = ee.Image(image)
     bands = image.bandNames()
 
     def _sum(index, prev):
+        prev = ee.List(prev)
         curr_image = image.select([index]).unmask(0)
         prev_image = prev.get(-1).unmask(0)
         new_image = prev_image.add(curr_image)
@@ -54,6 +56,8 @@ def find_stable_sequence(events, value, min_stability, max_masked, max_errors):
         An ee.Image with band whose values represent the band index in the
         input image where the earliest stable sequence of values occurs.
     """
+    events = ee.Image(events)
+
     seq_length = ee.Number(max_masked).add(max_errors).add(min_stability)
     num_events = events.bandNames().length()
     indices = ee.List.sequence(0, num_events.subtract(1))
@@ -109,6 +113,8 @@ def find_stable_sequences(events, values, min_stabilities, max_masked,
         An ee.Image with one band whose values represent the band index of the
         input image where the first stable sequence of values occurs.
     """
+    events = ee.Image(events)
+
     indices = ee.List.sequence(0, values.length().subtract(1))
 
     def _match(index):

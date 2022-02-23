@@ -21,6 +21,10 @@ def match_sequence(events, sequence, offset=0):
         An ee.Image with one band whose values are the band index of the input
         image where sequence first occurs plus offset
     """
+    events = ee.Image(events)
+    sequence = ee.List(sequence)
+    offset = ee.Number(offset)
+
     num_events = events.bandNames().length()
     seq_length = sequence.length()
 
@@ -30,6 +34,7 @@ def match_sequence(events, sequence, offset=0):
     indices_im = ee.Image.constant(indices)
 
     def _check(index, prev):
+        prev = ee.Image(prev)
         compare_to = events.slice(index, seq_length.add(index))
         result = seq_im.eq(compare_to).reduce(ee.Reducer.allNonZero())
         return prev.addBands(result.selfMask())
@@ -60,6 +65,10 @@ def match_sequences(events, sequences, offsets):
         events where the first of sequences occurs plus some sequence specific
         offset.
     """
+    events = ee.Image(events)
+    sequences = ee.List(sequences)
+    offsets = ee.List(offsets)
+
     indices = ee.List.sequence(0, sequences.length().subtract(1))
 
     def _match(index):
