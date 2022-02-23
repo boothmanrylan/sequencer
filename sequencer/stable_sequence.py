@@ -25,7 +25,7 @@ def accumulative_sum(image):
     def _sum(index, prev):
         prev = ee.List(prev)
         curr_image = image.select([index]).unmask(0)
-        prev_image = prev.get(-1).unmask(0)
+        prev_image = ee.Image(prev.get(-1)).unmask(0)
         new_image = prev_image.add(curr_image)
         return prev.add(new_image)
 
