@@ -130,6 +130,6 @@ def find_stable_sequences(events, values, min_stabilities, max_masked,
                                       curr_max_masked, curr_max_errors)
         return result.int()
 
-    matches = indices.map(_match).toBands()
+    matches = ee.ImageCollection.fromImages(indices.map(_match)).toBands()
 
     return matches.reduce(ee.Reducer.min(0))
