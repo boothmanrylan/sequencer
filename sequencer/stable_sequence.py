@@ -114,6 +114,10 @@ def find_stable_sequences(events, values, min_stabilities, max_masked,
         input image where the first stable sequence of values occurs.
     """
     events = ee.Image(events)
+    values = ee.List(values)
+    min_stabilities = ee.List(values)
+    max_masked = ee.List(max_masked)
+    max_errors = ee.List(max_errors)
 
     indices = ee.List.sequence(0, values.length().subtract(1))
 
