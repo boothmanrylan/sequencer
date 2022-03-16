@@ -21,18 +21,7 @@ def accumulative_sum(image):
     """
     image = ee.Image(image)
     bands = image.bandNames()
-
-    def _sum(index, prev):
-        prev = ee.List(prev)
-        curr_image = image.select([index]).unmask(0)
-        prev_image = ee.Image(prev.get(-1)).unmask(0)
-        new_image = prev_image.add(curr_image)
-        return prev.add(new_image)
-
-    sums = bands.iterate(_sum, ee.List([ee.Image(0)]))
-
-    # slice(1) to drop the blank image iterate starts with
-    return ee.ImageCollection.fromImages(sums).toBands().slice(1)
+    return image.unmask(0, False).toArray().arrayAccum(0).arrayFlatten([bands])
 
 
 def find_stable_sequence(events, value, min_stability, max_masked, max_errors):
