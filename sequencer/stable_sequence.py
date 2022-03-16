@@ -63,10 +63,12 @@ def find_stable_sequence(events, value, min_stability, max_masked, max_errors):
     indices = ee.List.sequence(0, num_events.subtract(1))
     indices_im = ee.Image.constant(indices)
 
+    value_im = ee.Image.constant(value)
+
     def _check(index):
         compare = events.slice(index, seq_length.add(index))
-        matches = compare.eq(value)
-        errors = compare.neq(value)
+        matches = compare.eq(value_im)
+        errors = compare.neq(value_im)
 
         accumulative_matches = accumulative_sum(matches)
         accumulative_errors = accumulative_sum(errors)
@@ -79,11 +81,11 @@ def find_stable_sequence(events, value, min_stability, max_masked, max_errors):
         # we only consider how many matches occur before max_errors errors
         # occur.
         test = (accumulative_matches.multiply(
-            accumulative_errors.lte(max_errors)).reduce(
-                ee.Reducer.max()).gte(min_stability))
+            accumulative_errors.lte(ee.Image.constant(max_errors))).reduce(
+                ee.Reducer.max()).gte(ee.Image.constant(min_stability)))
 
         # ensure that the first element matches to avoid off-by-one errors
-        first_is_match = compare.select(0).eq(value)
+        first_is_match = compare.select(0).eq(value_im)
         result = test.And(first_is_match)
 
         return result.selfMask()
@@ -132,4 +134,4 @@ def find_stable_sequences(events, values, min_stabilities, max_masked,
 
     matches = ee.ImageCollection.fromImages(indices.map(_match)).toBands()
 
-    return matches.reduce(ee.Reducer.min(0))
+    return matches.reduce(ee.Reducer.min())
